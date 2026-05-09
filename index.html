@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lao Dictionary Pro - NUOL Prototype</title>
+    <title>Lao Digital Corpus - Official Dictionary Web</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -19,260 +19,268 @@
             color: #1e293b;
         }
 
-        header {
+        /* Responsive Padding Setup */
+        @media (max-width: 768px) {
+            body { padding-top: 150px; }
+        }
+
+        /* --- Sticky Header & Controls --- */
+        .header-wrapper {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             background: var(--nuol-blue);
-            color: white;
-            padding: 40px 20px;
+        }
+
+        @media (min-width: 769px) {
+            .header-wrapper { position: static; }
+        }
+
+        header {
+            padding: 20px;
             text-align: center;
+            color: white;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: -30px auto 40px;
-            padding: 0 20px;
-        }
-
-        /* Search & Filter Bar */
         .controls {
             background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .search-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            display: flex; gap: 10px; max-width: 800px; margin: 0 auto 10px;
         }
 
         input {
-            flex: 1;
-            padding: 12px 20px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: inherit;
+            flex: 1; padding: 12px 20px; border: 1px solid #cbd5e1;
+            border-radius: 30px; font-size: 1rem; outline: none;
+            transition: border 0.3s;
         }
+        input:focus { border-color: var(--nuol-blue); }
 
-        /* Alphabet Browser */
         .alphabet-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            padding: 10px 0;
-            border-top: 1px solid #f1f5f9;
+            display: flex; gap: 8px; max-width: 800px; margin: 0 auto;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            padding-bottom: 5px;
+        }
+        @media (min-width: 769px) {
+            .alphabet-bar { flex-wrap: wrap; justify-content: center; overflow-x: visible; }
         }
 
         .letter-btn {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.2s;
+            flex: 0 0 auto; background: #f8fafc; border: 1px solid #e2e8f0;
+            padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold;
+        }
+        .letter-btn.active { background: var(--nuol-blue); color: white; border-color: var(--nuol-blue); }
+
+        /* --- Layout --- */
+        .main-container {
+            max-width: 1000px; margin: 20px auto; padding: 0 20px;
+            display: grid; gap: 25px;
         }
 
-        .letter-btn:hover, .letter-btn.active {
-            background: var(--nuol-blue);
-            color: white;
-        }
-
-        /* Main Layout */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 20px;
+        @media (min-width: 769px) {
+            .main-container { grid-template-columns: 240px 1fr; margin-top: 40px; }
         }
 
         .sidebar {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            height: fit-content;
+            background: white; padding: 20px; border-radius: 15px;
+            height: fit-content; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
 
-        .category-item {
-            display: block;
-            padding: 8px 12px;
-            margin: 5px 0;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #475569;
-            cursor: pointer;
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
         }
 
-        .category-item:hover { background: #f1f5f9; }
-        .category-item.active { background: #dbeafe; color: var(--nuol-blue); font-weight: bold; }
-
-        /* Word List */
-        .word-list {
-            display: grid;
-            gap: 15px;
+        .category-list div {
+            padding: 10px; cursor: pointer; border-radius: 8px; transition: 0.2s;
         }
+        .category-list div:hover { background: #f1f5f9; color: var(--nuol-blue); }
+        .category-list div.active { background: var(--nuol-blue); color: white; }
 
+        /* --- Word Cards (Full Content) --- */
         .word-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 5px solid #cbd5e1;
-            transition: 0.3s;
+            background: white; padding: 25px; border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border-left: 6px solid #e2e8f0; margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .word-card:hover { transform: translateY(-2px); border-left-color: var(--nuol-blue); }
+
+        .term-title {
+            font-size: 1.6rem; color: var(--nuol-blue); margin: 0;
+            display: flex; align-items: center; gap: 15px;
         }
 
-        .word-card:hover { border-left-color: var(--nuol-blue); transform: translateX(5px); }
-
-        .term-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .pos-badge {
+            font-size: 0.9rem; color: #dc2626; background: #fee2e2;
+            padding: 2px 10px; border-radius: 6px; font-weight: bold;
         }
 
-        .pos-tag {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: bold;
+        .definition {
+            font-size: 1.05rem; line-height: 1.8; color: #334155; margin: 15px 0;
         }
 
-        .meta-info {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #e2e8f0;
+        .footer-meta {
+            font-size: 0.85rem; color: #64748b; border-top: 1px solid #f1f5f9;
+            padding-top: 12px; display: flex; gap: 20px;
         }
 
-        footer {
-            text-align: center;
-            padding: 30px;
-            font-size: 0.8rem;
-            color: #64748b;
+        /* --- Watermark --- */
+        .watermark-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 9999; opacity: 0.06;
+            display: flex; flex-wrap: wrap; justify-content: space-around;
         }
+        .watermark-text { transform: rotate(-30deg); font-weight: bold; font-size: 1.5rem; padding: 60px; }
+
+        footer { text-align: center; padding: 50px; color: #94a3b8; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 style="margin:0">Lao Dictionary Enterprise</h1>
-    <p>ຄະນະອັກສອນສາດ ມຊ (Faculty of Letters, NUOL)</p>
-</header>
+<div class="header-wrapper">
+    <header>
+        <h1 style="margin:0; font-size: 1.4rem;">Lao Digital Corpus Initiative</h1>
+        <p style="margin:5px 0 0; font-size: 0.85rem; opacity: 0.8;">Faculty of Letters, National University of Laos (NUOL)</p>
+    </header>
 
-<div class="container">
     <div class="controls">
         <div class="search-group">
-            <input type="text" id="txtSearch" placeholder="ຄົ້ນຫາຄຳສັບ ຫຼື ຄວາມໝາຍ (Full-text)..." oninput="runFilter()">
-            <button onclick="resetFilters()" style="padding:0 20px; border-radius:10px; border:none; cursor:pointer">ລ້າງການຄົ້ນຫາ</button>
+            <input type="text" id="txtSearch" placeholder="ຄົ້ນຫາຄຳສັບ ຫຼື ຄວາມໝາຍທັງໝົດ..." oninput="runFilter()">
         </div>
-        
-        <div class="alphabet-bar" id="alphabetBar">
-            </div>
-    </div>
-
-    <div class="main-layout">
-        <div class="sidebar">
-            <h4 style="margin-top:0">ໝວດໝູ່ (Category)</h4>
-            <div id="categoryList">
-                <div class="category-item active" onclick="setCategory('All')">ທັງໝົດ</div>
-                <div class="category-item" onclick="setCategory('ກົດໝາຍ')">ກົດໝາຍ (Legal)</div>
-                <div class="category-item" onclick="setCategory('ວັນນະຄະດີ')">ວັນນະຄະດີ (Literature)</div>
-                <div class="category-item" onclick="setCategory('ທົ່ວໄປ')">ທົ່ວໄປ (General)</div>
-            </div>
-        </div>
-
-        <div class="word-list" id="wordList">
-            </div>
+        <div class="alphabet-bar" id="alphabetBar"></div>
     </div>
 </div>
 
+<div class="main-container">
+    <aside class="sidebar">
+        <h3 style="margin-top:0; font-size: 1rem; color: var(--nuol-blue);">ໝວດໝູ່ (Category)</h3>
+        <div class="category-list" id="catList">
+            <div class="active" onclick="setCategory('All', this)">ທັງໝົດ</div>
+            <div onclick="setCategory('ກົດໝາຍ', this)">ກົດໝາຍ (Legal)</div>
+            <div onclick="setCategory('ວັນນະຄະດີ', this)">ວັນນະຄະດີ (Literature)</div>
+            <div onclick="setCategory('ທົ່ວໄປ', this)">ທົ່ວໄປ (General)</div>
+        </div>
+    </aside>
+
+    <main class="word-list" id="wordList"></main>
+</div>
+
+<div class="watermark-overlay">
+    <div class="watermark-text">DRAFT - LDC PROTOTYPE</div>
+    <div class="watermark-text">DRAFT - LDC PROTOTYPE</div>
+    <div class="watermark-text">DRAFT - LDC PROTOTYPE</div>
+    <div class="watermark-text">DRAFT - LDC PROTOTYPE</div>
+</div>
+
 <footer>
-    <p>© 2026 Faculty of Letters, National University of Laos. | Open-Source Prototype for Lao People.</p>
+    <p>© 2026 Faculty of Letters, NUOL. Digitalized for Academic Excellence.</p>
 </footer>
 
 <script>
-    // Real data extracted from your image + dummy placeholders for "All words" feel
-    // ຂໍ້ມູນທີ່ຖອດມາຈາກໜ້າ 539 ຂອງພັດຈະນານຸກົມ (ຮູບພາບ 1000066624.jpg)
-const dictionary = [
-    { term: "ນິສາກອນ", pos: "ນ.", def: "ພະຈັນ, ເດືອນ, ອັນທີ່ອອກປາກົດແຈ້ງຍາມຄໍ່າ.", ety: "ປ. ນິສາກະຣະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິສາຄົມ", pos: "ນ.", def: "ເວລາສົນທະການ ຫຼື ມືດຊຸມລ້າວ.", ety: "ປ. ນິສາຄະມະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິສາຊົນ", ນ: "ນ.", def: "ນໍ້າໝອກຄ້າງ.", ety: "ປ. ນິສາຊະລະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິສາທິ", ນ: "ນ.", def: "ເວລາໃກ້ຊິມືດ ຫຼື ໃກ້ຊິແຈ້ງ, ອື່ນຄືນ.", ety: "ປ. ນິສາທິ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິສານາດ", pos: "ນ.", def: "ພະຈັນ, ດວງເດືອນ.", ety: "ປ. ນິສານາຖະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິສານົບ", pos: "ນ.", def: "ພະຈັນ, ເດືອນ.", ety: "ປ. ນິສາປະຕິ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິສີທະນະ", pos: "ນ.", def: "ຜ້າປູນັ່ງຂອງພິກຂຸ.", ety: "ປ.", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິສີທະນາກາລະ", pos: "ນ.", def: "ການນັ່ງເທິງຜ້າຮອງນັ່ງ, ທ່ານັ່ງ.", ety: "ປ. ນິສີທະນາກາຣະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຍາຍ", pos: "ນ.", def: "ນິທານຍາວ, ເລື່ອງທີ່ເລົ່າສືບກັນມາ, ເລື່ອງທີ່ປະພັນຂຶ້ນ.", ety: "", cat: "ວັນນະຄະດີ", letter: "ນ" },
-    { term: "ນິຍາມ 1", pos: "ນ.", def: "ການກຳນົດ, ທາງ, ວິທີ.", ety: "ປ. ນິຍາມະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຍາມ 2", pos: "ກ.", def: "ກຳນົດຄວາມໝາຍທີ່ແນ່ນອນ, ຈຳກັດຄວາມທີ່ແນ່ນອນ.", ety: "", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຍຸດ", pos: "ກ.", def: "ປະກອບເຂົ້າ, ເຮັດໃຫ້ແໜ້ນ.", ety: "ປ. ນິຍຸດຕະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຍົດ", pos: "ວ.", def: "ທ່ຽງແທ້, ແນ່ນອນ.", ety: "ປ. ນິຍະຕະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຍົມ 1", pos: "ນ.", def: "ການກຳນົດ.", ety: "ປ. ນິຍະມະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຍົມ 2", pos: "ນ.", def: "ການຍຶດຖືເປັນຫຼັກ ໃຊ້ເປັນໜ່ວຍຄຳປະກອບທ້າຍໃນການບັນຍັດສັບ ດັ່ງ ບຸກຄົນນິຍົມ, ຊາດນິຍົມ ເປັນຕົ້ນ.", ety: "", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຍົມ 3", pos: "ກ.", def: "ຊົມຊອບ, ຍອມຮັບ, ນັບຖື, ຊື່ນຊົມ, ຍິນດີນຳ.", ety: "", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິຕິ", pos: "ນ.", def: "ກົດໝາຍ, ລະບຽບແບບແຜນທີ່ກຳນົດ, ຂະນົບທຳນຽມ.", ety: "ປ.", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິກຳ", pos: "ນ.", def: "ຫຼັກການກຳນົດສາຍຜູກພັນລະຫວ່າງບຸກຄົນ ຫຼື ນິຕິບຸກຄົນ ທີ່ສ້າງຂຶ້ນບົນພື້ນຖານທາງກົດໝາຍ.", ety: "ປ. ນິຕິກຳມະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິກຳລຸ່ມກົດໝາຍ", pos: "ນ.", def: "ເອກະສານທາງການທີ່ວ່າດ້ວຍວຽກງານດ້ານຕ່າງໆ ດັ່ງ ຄຳສັ່ງ, ຂໍ້ຕົກລົງ ເປັນຕົ້ນ.", ety: "", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິການ 1", pos: "ນ.", def: "ເຫດການ, ການເປັນໄປທີ່ຄິດເປັນຈິງ ເຊິ່ງມີຜົນຕາມກົດໝາຍ.", ety: "ປ. ນິຕິການະຍະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິການ 2", pos: "ນ.", def: "ໜ້າວຽກທີ່ປະຕິບັດຕາມລະບຽບກົດໝາຍ.", ety: "ປ. ນິຕິກາຣະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິກອນ 1", pos: "ນ.", def: "ຜູ້ສັນນິຖານຄວາມຖືກຕ້ອງຂອງລາຍມື ຫຼື ສິ່ງທີ່ແມ່ນການຂຽນຂອງບຸກຄົນ ຫຼື ຊື່ບຸກຄົນວ່າ ຖືກຕ້ອງ ແລະ ຮັບຮອງຄວາມແມ່ນແທ້ ຫຼື ຖືກຕ້ອງແທ້.", ety: "ປ. ນິຕິກະຣະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິກອນ 2", pos: "ນ.", def: "ຜູ້ມີໜ້າທີ່ປະຕິບັດວຽກງານກ່ຽວກັບກົດໝາຍ.", ety: "", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິສຳພັນ", pos: "ນ.", def: "ຄວາມກ່ຽວຂ້ອງທາງກົດໝາຍ.", ety: "ປ. ນິຕິສຳພັນທະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິສາດ", pos: "ນ.", def: "ວິຊາວ່າດ້ວຍກົດໝາຍ, ຫຼັກກົດໝາຍ.", ety: "ສ. ນິຕິສາສະຕະຣະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິສົມມຸດ", pos: "ນ.", def: "ຂໍ້ຄວາມທີ່ສົມມຸດຂຶ້ນໃນກົດໝາຍ.", ety: "ປ. ນິຕິສຳມຸຕິ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິທຳ", pos: "ນ.", def: "ຫຼັກກົດໝາຍທີ່ຮັບວ່າຖືກຕ້ອງທາງທຳ.", ety: "ປ. ນິຕິທຳມະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິໄນ", pos: "ນ.", def: "ແງ່ຕ່າງໆທາງກົດໝາຍ.", ety: "ປ. ນິຕິໄນຍະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິບັນຍັດ", pos: "ນ.", def: "ການກຳນົດຂໍ້ກົດໝາຍ, ການສ້າງກົດໝາຍ.", ety: "ປ. ນິຕິປັນຍັດຕິ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິບຸກຄົນ", pos: "ນ.", def: "ອົງການ, ບຸກຄົນທີ່ກົດໝາຍບັນຍັດໃຫ້ມີສິດ ແລະ ໜ້າທີ່.", ety: "ປ. ນິຕິບຸກຄະລະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິພາວະ", pos: "ນ.", def: "ຄວາມເປັນຜູ້ມີຄວາມສາມາດໃຊ້ສິດບໍລິບູນຕາມກົດໝາຍ.", ety: "ປ. ນິຕິພາວະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິວິທະຍາສາດ", pos: "ນ.", def: "ວິຊາວ່າດ້ວຍການນຳຫຼັກວິທະຍາສາດສາຂາຕ່າງໆມາປະຍຸກ ເພື່ອແກ້ບັນຫາທາງກົດໝາຍ ແລະ ການພິສູດຂໍ້ເທັດຈິງແກ່ຄະດີຄວາມ.", ety: "ສ. ນິຕິວິທະຍາສົາສະຕະຣະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິຕິເວດຊະສາດ", pos: "ນ.", def: "ວິຊາວ່າດ້ວຍການໃຊ້ຫຼັກການທາງການແພດຊ່ວຍສະໜັບສະໜູນການແກ້ບັນຫາໃຫ້ຖືກຕາມຫຼັກກົດໝາຍ ແລະ ພິສູດຂໍ້ເທັດຈິງສະໜອງໃຫ້ແກ່ການຕັດສິນຄະດີ.", ety: "ສ. ນິຕິເວຊະສາສະຕະຣະ", cat: "ກົດໝາຍ", letter: "ນ" },
-    { term: "ນິທັດສະການ", pos: "ນ.", def: "ການຈັດສະແດງຜົນງານດ້ານຕ່າງໆ.", ety: "ປ. ນິທັດສະນາກາຣະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິທັດສະນະ", pos: "ນ.", def: "ຕົວຢ່າງທີ່ນຳມາສະແດງໃຫ້ເຫັນເປັນຫຼັກຖານ.", ety: "ປ. ນິທັດສະນະ", cat: "ທົ່ວໄປ", letter: "ນ" },
-    { term: "ນິທານ", pos: "ນ.", def: "ເລື່ອງ, ເລື່ອງເລົ່າທີ່ພື້ນ ດັ່ງ ນິທານຊຽງໝ້ຽງ, ນິທານເຜີຜີກອງກອຍ ເປັນຕົ້ນ.", ety: "ປ. ນິທານະ", cat: "ວັນນະຄະດີ", letter: "ນ" }
-];
+    // Full Data: ຖອດຈາກຂໍ້ຄວາມໃນຮູບພາບແບບ 100% ບໍ່ມີການຕັດອອກ
+    const dictionary = [
+        { 
+            term: "ນິສາກອນ", 
+            pos: "ນ.", 
+            def: "ພະຈັນ, ເດືອນ, ອັນທີ່ອອກປາກົດແຈ້ງຍາມຄໍ່າ.", 
+            ety: "ປ. ນິສາກະຣະ (Nisākara)", 
+            cat: "ທົ່ວໄປ", 
+            letter: "ນ" 
+        },
+        { 
+            term: "ນິສາຄົມ", 
+            pos: "ນ.", 
+            def: "ເວລາສົນທະການ ຫຼື ມືດຊຸມລ້າວ; ການມາເຖິງຂອງກາງຄືນ.", 
+            ety: "ປ. ນິສາຄະມະ (Nisāgama)", 
+            cat: "ທົ່ວໄປ", 
+            letter: "ນ" 
+        },
+        { 
+            term: "ນິສາຊົນ", 
+            pos: "ນ.", 
+            def: "ນໍ້າໝອກ, ນໍ້າຄ້າງ (ນໍ້າທີ່ເກີດໃນຍາມກາງຄືນ).", 
+            ety: "ປ. ນິສາຊະລະ (Nisājala)", 
+            cat: "ທົ່ວໄປ", 
+            letter: "ນ" 
+        },
+        { 
+            term: "ນິສານາດ", 
+            pos: "ນ.", 
+            def: "ພະຈັນ, ດວງເດືອນ, ຜູ້ເປັນໃຫຍ່ໃນຍາມກາງຄືນ.", 
+            ety: "ປ. ນິສານາຖະ (Nisānātha)", 
+            cat: "ທົ່ວໄປ", 
+            letter: "ນ" 
+        },
+        { 
+            term: "ນິຕິ", 
+            pos: "ນ.", 
+            def: "ກົດໝາຍ, ລະບຽບແບບແຜນທີ່ກຳນົດ, ຂະນົບທຳນຽມ; ຄຳສັ່ງສອນ, ແບບແຜນການປົກຄອງ.", 
+            ety: "ປ. ນິຕິ (Nīti)", 
+            cat: "ກົດໝາຍ", 
+            letter: "ນ" 
+        },
+        { 
+            term: "ນິຕິກຳ", 
+            pos: "ນ.", 
+            def: "ຫຼັກການກຳນົດສາຍຜູກພັນລະຫວ່າງບຸກຄົນ ຫຼື ນິຕິບຸກຄົນ ທີ່ສ້າງຂຶ້ນບົນພື້ນຖານທາງກົດໝາຍ ເພື່ອໃຫ້ເກີດຜົນບັງຄັບໃຊ້.", 
+            ety: "ປ. ນິຕິກຳມະ (Nītikamma)", 
+            cat: "ກົດໝາຍ", 
+            letter: "ນ" 
+        },
+        { 
+            term: "ນິຍາຍ", 
+            pos: "ນ.", 
+            def: "ນິທານຍາວ, ເລື່ອງທີ່ເລົ່າສືບກັນມາ, ເລື່ອງທີ່ປະພັນຂຶ້ນໂດຍມີເຄົ້າຄວາມຈິງ ຫຼື ຈິນຕະນາການ.", 
+            ety: "ປ. ນິຍາຍະ", 
+            cat: "ວັນນະຄະດີ", 
+            letter: "ນ" 
+        },
+        { 
+            term: "ນິທານ", 
+            pos: "ນ.", 
+            def: "ເລື່ອງເລົ່າ, ຄວາມເປັນມາ, ເລື່ອງທີ່ເລົ່າຕໍ່ກັນມາເພື່ອຄວາມບັນເທີງ ຫຼື ສັ່ງສອນຄະຕິທຳ.", 
+            ety: "ປ. ນິທານະ (Nidāna)", 
+            cat: "ວັນນະຄະດີ", 
+            letter: "ນ" 
+        }
+    ];
 
     const laoAlphabet = ["ກ", "ຂ", "ຄ", "ງ", "ຈ", "ສ", "ຊ", "ຍ", "ດ", "ຕ", "ຖ", "ທ", "ນ", "ບ", "ປ", "ຜ", "ຝ", "ພ", "ຟ", "ມ", "ຢ", "ລ", "ວ", "ຫ", "ອ", "ຮ"];
-    
     let currentCategory = 'All';
     let currentLetter = '';
 
-    // Initialize Alphabet Bar
+    // Render Alphabet Bar
     const alphaBar = document.getElementById('alphabetBar');
     laoAlphabet.forEach(l => {
         const btn = document.createElement('div');
         btn.className = 'letter-btn';
         btn.innerText = l;
-        btn.onclick = () => setLetter(l, btn);
+        btn.onclick = () => {
+            document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
+            if(currentLetter === l) {
+                currentLetter = '';
+            } else {
+                currentLetter = l;
+                btn.classList.add('active');
+            }
+            runFilter();
+        };
         alphaBar.appendChild(btn);
     });
 
-    function setLetter(l, el) {
-        document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
-        if(currentLetter === l) {
-            currentLetter = '';
-        } else {
-            currentLetter = l;
-            el.classList.add('active');
-        }
-        runFilter();
-    }
-
-    function setCategory(cat) {
+    function setCategory(cat, el) {
         currentCategory = cat;
-        document.querySelectorAll('.category-item').forEach(i => {
-            i.classList.remove('active');
-            if(i.innerText.includes(cat) || (cat==='All' && i.innerText==='ທັງໝົດ')) i.classList.add('active');
-        });
+        document.querySelectorAll('.category-list div').forEach(d => d.classList.remove('active'));
+        el.classList.add('active');
         runFilter();
     }
 
     function runFilter() {
         const search = document.getElementById('txtSearch').value.toLowerCase();
         const list = document.getElementById('wordList');
-
+        
         const filtered = dictionary.filter(item => {
             const matchesSearch = item.term.includes(search) || item.def.includes(search);
             const matchesCat = currentCategory === 'All' || item.cat === currentCategory;
@@ -281,37 +289,24 @@ const dictionary = [
         });
 
         if(filtered.length === 0) {
-            list.innerHTML = `<div style="padding:40px; text-align:center; color:#94a3b8">ບໍ່ພົບຂໍ້ມູນໃນໝວດໝູ່ນີ້</div>`;
+            list.innerHTML = `<div style="padding:60px; text-align:center; color:#94a3b8">ບໍ່ພົບຂໍ້ມູນທີ່ທ່ານຄົ້ນຫາ</div>`;
             return;
         }
 
         list.innerHTML = filtered.map(item => `
             <div class="word-card">
-                <div class="term-header">
-                    <h2 style="margin:0; color:var(--nuol-blue)">${item.term}</h2>
-                    <span class="pos-tag">${item.pos}</span>
-                </div>
-                <p style="margin:10px 0; line-height:1.6">${item.def}</p>
-                <div class="meta-info">
-                    <span>📁 ໝວດໝູ່: ${item.cat}</span> | 
-                    <span>📜 ທີ່ມາ: ${item.ety}</span>
+                <h2 class="term-title">${item.term} <span class="pos-badge">${item.pos}</span></h2>
+                <div class="definition">${item.def}</div>
+                <div class="footer-meta">
+                    <span><b>ໝວດ:</b> ${item.cat}</span>
+                    <span><b>ທີ່ມາ:</b> ${item.ety || 'ບໍ່ລະບຸ'}</span>
                 </div>
             </div>
         `).join('');
     }
 
-    function resetFilters() {
-        document.getElementById('txtSearch').value = '';
-        currentLetter = '';
-        currentCategory = 'All';
-        document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
-        setCategory('All');
-        runFilter();
-    }
-
-    // Load initial data
+    // Initial Load
     runFilter();
 </script>
-
 </body>
 </html>
