@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Lao Dictionary Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003366;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --sidebar: #1e293b;
+        }
+
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: #334155;
+        }
+
+        /* --- Login Page Styles --- */
+        #login-page {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #1e40af);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-add { background: var(--success); color: white; }
+        .btn-edit { background: #3b82f6; color: white; padding: 5px 10px; font-size: 0.8rem; }
+        .btn-delete { background: var(--danger); color: white; padding: 5px 10px; font-size: 0.8rem; }
+
+        /* --- Dashboard Layout --- */
+        #dashboard-page { display: none; min-height: 100vh; }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            color: white;
+            position: fixed;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .main-content { margin-left: 260px; padding: 40px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* --- Table Style --- */
+        .data-table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .data-table th, .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .data-table th { background: #f8fafc; color: #64748b; }
+
+        /* --- Modal Styles --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 500px;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="login-page">
+    <div class="login-card">
+        <img src="https://nuol.edu.la/images/newslogo2026/Logo_NUOL-ORiginal.png" height="80" alt="Logo">
+        <h2>Admin Login</h2>
+        <p style="color: #64748b; margin-bottom: 30px;">ລະບົບຈັດການຂໍ້ມູນພັດຈະນານຸກົມ</p>
+        
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="admin">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary" onclick="handleLogin()">ເຂົ້າສູ່ລະບົບ</button>
+        <p id="login-error" style="color: var(--danger); margin-top: 15px; font-size: 0.9rem;" class="hidden">ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ!</p>
+    </div>
+</div>
+
+<div id="dashboard-page">
+    <div class="sidebar">
+        <h3>Dictionary Admin</h3>
+        <hr style="opacity: 0.1; margin: 20px 0;">
+        <p style="color: #94a3b8; font-size: 0.8rem;">MENU</p>
+        <div style="cursor:pointer; padding: 10px 0; color: #3b82f6;">● ຈັດການຄຳສັບ</div>
+        <div style="cursor:pointer; padding: 10px 0; opacity: 0.6;">● ລາຍງານການໃຊ້ງານ</div>
+        <div style="cursor:pointer; padding: 10px 0; opacity: 0.6;">● ຕັ້ງຄ່າລະບົບ</div>
+        <div style="margin-top: 50px;">
+            <button class="btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; width: 100%;" onclick="handleLogout()">ອອກຈາກລະບົບ</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1>ຈັດການຖານຂໍ້ມູນຄຳສັບ</h1>
+            <button class="btn btn-add" onclick="openModal('add')">+ ເພີ່ມຄຳສັບໃໝ່</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <small>ຄຳສັບທັງໝົດ</small>
+                <h2 id="total-words">0</h2>
+            </div>
+            <div class="stat-card">
+                <small>ໝວດໝູ່ກົດໝາຍ</small>
+                <h2 id="legal-count">0</h2>
+            </div>
+            <div class="stat-card">
+                <small>ອັບເດດລ້າສຸດ</small>
+                <h2>ມື້ນີ້</h2>
+            </div>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ຄຳສັບ (Term)</th>
+                    <th>ປະເພດ</th>
+                    <th>ໝວດໝູ່</th>
+                    <th>ການຈັດການ</th>
+                </tr>
+            </thead>
+            <tbody id="admin-table-body">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="wordModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modal-title">ເພີ່ມຄຳສັບ</h2>
+        <input type="hidden" id="edit-index">
+        <div class="input-group">
+            <label>ຄຳສັບ (Term)</label>
+            <input type="text" id="m-term">
+        </div>
+        <div style="display: flex; gap: 15px;">
+            <div class="input-group" style="flex: 1;">
+                <label>ປະເພດ (POS)</label>
+                <select id="m-pos">
+                    <option value="ນ.">ນາມ (ນ.)</option>
+                    <option value="ກ.">ກິລິຍາ (ກ.)</option>
+                    <option value="ວ.">ວິເສດ (ວ.)</option>
+                </select>
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label>ໝວດໝູ່</label>
+                <select id="m-cat">
+                    <option value="ທົ່ວໄປ">ທົ່ວໄປ</option>
+                    <option value="ກົດໝາຍ">ກົດໝາຍ</option>
+                    <option value="ວັນນະຄະດີ">ວັນນະຄະດີ</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>ຄວາມໝາຍ (Definition)</label>
+            <textarea id="m-def" rows="4"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button class="btn" style="background:#e2e8f0;" onclick="closeModal()">ຍົກເລີກ</button>
+            <button class="btn btn-primary" style="width: auto;" onclick="saveWord()">ບັນທຶກຂໍ້ມູນ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ຂໍ້ມູນເລີ່ມຕົ້ນທີ່ຖອດມາຈາກຮູບພາບ
+    let db = [
+        { term: "ນິສາກອນ", pos: "ນ.", def: "ພະຈັນ, ເດືອນ, ອັນທີ່ອອກປາກົດແຈ້ງຍາມຄໍ່າ.", ety: "ປ. ນິສາກະຣະ", cat: "ທົ່ວໄປ" },
+        { term: "ນິຕິກຳ", pos: "ນ.", def: "ຫຼັກການກຳນົດສາຍຜູກພັນລະຫວ່າງບຸກຄົນ ຫຼື ນິຕິບຸກຄົນ ທີ່ສ້າງຂຶ້ນບົນພື້ນຖານທາງກົດໝາຍ.", ety: "ປ. ນິຕິກຳມະ", cat: "ກົດໝາຍ" },
+        { term: "ນິຍາຍ", pos: "ນ.", def: "ນິທານຍາວ, ເລື່ອງທີ່ເລົ່າສືບກັນມາ, ເລື່ອງທີ່ປະພັນຂຶ້ນ.", ety: "", cat: "ວັນນະຄະດີ" }
+    ];
+
+    function handleLogin() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const err = document.getElementById('login-error');
+
+        if(u === 'admin' && p === 'admin') {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('dashboard-page').style.display = 'block';
+            renderTable();
+        } else {
+            err.classList.remove('hidden');
+        }
+    }
+
+    function handleLogout() {
+        location.reload();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = '';
+        
+        db.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${item.term}</b></td>
+                <td><span style="color:red">${item.pos}</span></td>
+                <td>${item.cat}</td>
+                <td>
+                    <button class="btn btn-edit" onclick="openModal('edit', ${index})">แก้ไข</button>
+                    <button class="btn btn-delete" onclick="deleteWord(${index})">ลบ</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Update Stats
+        document.getElementById('total-words').innerText = db.length;
+        document.getElementById('legal-count').innerText = db.filter(x => x.cat === 'ກົດໝາຍ').length;
+    }
+
+    function openModal(mode, index = null) {
+        const modal = document.getElementById('wordModal');
+        modal.style.display = 'flex';
+        
+        if(mode === 'edit') {
+            document.getElementById('modal-title').innerText = 'ແກ້ໄຂຄຳສັບ';
+            document.getElementById('edit-index').value = index;
+            document.getElementById('m-term').value = db[index].term;
+            document.getElementById('m-pos').value = db[index].pos;
+            document.getElementById('m-cat').value = db[index].cat;
+            document.getElementById('m-def').value = db[index].def;
+        } else {
+            document.getElementById('modal-title').innerText = 'ເພີ່ມຄຳສັບໃໝ່';
+            document.getElementById('edit-index').value = '';
+            document.getElementById('m-term').value = '';
+            document.getElementById('m-def').value = '';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('wordModal').style.display = 'none';
+    }
+
+    function saveWord() {
+        const idx = document.getElementById('edit-index').value;
+        const newWord = {
+            term: document.getElementById('m-term').value,
+            pos: document.getElementById('m-pos').value,
+            cat: document.getElementById('m-cat').value,
+            def: document.getElementById('m-def').value,
+            ety: ""
+        };
+
+        if(idx === '') {
+            db.unshift(newWord); // Add new to top
+        } else {
+            db[idx] = newWord; // Update existing
+        }
+
+        closeModal();
+        renderTable();
+    }
+
+    function deleteWord(index) {
+        if(confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຈະລຶບຄຳສັບນີ້?')) {
+            db.splice(index, 1);
+            renderTable();
+        }
+    }
+</script>
+
+</body>
+</html>
